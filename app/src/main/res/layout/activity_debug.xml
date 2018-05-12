@@ -48,6 +48,6 @@
         android:layout_height="300dp"
         android:background="@color/light_grey"
         android:layout_margin="10dp"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center" />
 
 </LinearLayout>
