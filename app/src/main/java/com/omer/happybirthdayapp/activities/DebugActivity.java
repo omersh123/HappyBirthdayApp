@@ -1,23 +1,13 @@
 package com.omer.happybirthdayapp.activities;
 
-import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.design.widget.BottomSheetBehavior;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatEditText;
@@ -25,21 +15,15 @@ import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.AppCompatTextView;
 import android.view.View;
 import android.widget.DatePicker;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.omer.happybirthdayapp.R;
 import com.omer.happybirthdayapp.models.Baby;
 import com.omer.happybirthdayapp.utils.AddImageUtil;
-import com.omer.happybirthdayapp.utils.PathUtil;
 
 import org.json.JSONException;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -55,11 +39,11 @@ public class DebugActivity extends AppCompatActivity {
     private BottomSheetBehavior<LinearLayout> bottomSheetBehavior;
     private AppCompatButton cameraBtn;
     private AppCompatButton galleryBtn;
+    private AppCompatButton startBirthdayActivityBtn;
     private SimpleDateFormat sdf;
     private Bitmap babyBitmap;
 
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_debug);
         sdf = new SimpleDateFormat("MM/dd/yyyy");
@@ -76,6 +60,7 @@ public class DebugActivity extends AppCompatActivity {
         bottomSheet = (LinearLayout) findViewById(R.id.bottom_sheet);
         cameraBtn = (AppCompatButton) findViewById(R.id.camera_btn);
         galleryBtn = (AppCompatButton) findViewById(R.id.gallery_btn);
+        startBirthdayActivityBtn = (AppCompatButton) findViewById(R.id.start_birthday_activity_btn);
 
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
 
@@ -117,6 +102,12 @@ public class DebugActivity extends AppCompatActivity {
                 AddImageUtil.dispatchTakePictureIntent(DebugActivity.this);
             }
         });
+        startBirthdayActivityBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(DebugActivity.this, BirthdayActivity.class));
+            }
+        });
     }
 
     private void showEditDateDiaolg() {
@@ -127,7 +118,7 @@ public class DebugActivity extends AppCompatActivity {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                 Calendar calendar = Calendar.getInstance();
-                calendar.set(year,month,dayOfMonth);
+                calendar.set(year, month, dayOfMonth);
                 baby.setBirthday(calendar.getTime());
                 saveData();
                 reloadUI();
@@ -139,16 +130,17 @@ public class DebugActivity extends AppCompatActivity {
 
     private void reloadUI() {
         debugActivityNameTextView.setText(getString(R.string.name_with_hint, baby.getName()));
-        debugActivityBirthdayTextView.setText(getString(R.string.birthday_with_hint, baby.isBirthdayEmpty()?"":sdf.format(baby.getBirthday())));
+        debugActivityBirthdayTextView.setText(getString(R.string.birthday_with_hint, baby.isBirthdayEmpty() ? "" : sdf.format(baby.getBirthday())));
         debugActivityImageTextView.setText(getString(R.string.image_with_hint, baby.getImageUrl()));
 
         if (AddImageUtil.checkGeneralPermissions(this)) {
             babyBitmap = BitmapFactory.decodeFile(baby.getImageUrl());
             debugActivityImageView.setImageBitmap(babyBitmap);
         }
+        startBirthdayActivityBtn.setEnabled(baby.isValid());
     }
 
-    private void showEditNameDiaolg(){
+    private void showEditNameDiaolg() {
         final Dialog dialog = new Dialog(this, R.style.ThemeDialog);
         dialog.setContentView(R.layout.dialog_edit_text);
         final AppCompatEditText dialogEditText = (AppCompatEditText) dialog.findViewById(R.id.dialog_edit_text);
@@ -169,18 +161,18 @@ public class DebugActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (bottomSheetBehavior!=null && bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED)
+        if (bottomSheetBehavior != null && bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED)
             showBottomSheet(false);
         else
             super.onBackPressed();
     }
 
     private void showBottomSheet(boolean shouldShow) {
-        bottomSheetBehavior.setState(shouldShow?BottomSheetBehavior.STATE_EXPANDED:BottomSheetBehavior.STATE_COLLAPSED);
+        bottomSheetBehavior.setState(shouldShow ? BottomSheetBehavior.STATE_EXPANDED : BottomSheetBehavior.STATE_COLLAPSED);
 
     }
 
-    public void reloadData(){
+    public void reloadData() {
         try {
             baby.load();
         } catch (JSONException e) {
@@ -189,7 +181,7 @@ public class DebugActivity extends AppCompatActivity {
         }
     }
 
-    public void saveData(){
+    public void saveData() {
         try {
             baby.save();
         } catch (JSONException e) {
@@ -209,9 +201,9 @@ public class DebugActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode,permissions,grantResults);
-        AddImageUtil.onRequestPermissionsResult(this, requestCode,permissions,grantResults);
-        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && AddImageUtil.isFromCamera==null) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        AddImageUtil.onRequestPermissionsResult(this, requestCode, permissions, grantResults);
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && AddImageUtil.isFromCamera == null) {
             reloadUI();
         }
     }

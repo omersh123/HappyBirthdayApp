@@ -1,17 +1,12 @@
 package com.omer.happybirthdayapp.utils;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
-import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -65,7 +60,7 @@ public class AddImageUtil {
             if (photoFile != null) {
                 currentImageFile = photoFile;
                 Uri photoURI = FileProvider.getUriForFile(activity,
-                        activity.getPackageName()+".fileprovider",
+                        activity.getPackageName() + ".fileprovider",
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 activity.startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
@@ -79,36 +74,34 @@ public class AddImageUtil {
     }
 
     private static boolean checkPermissions(Activity activity) {
-        if (isFromCamera!=null && isFromCamera && ContextCompat.checkSelfPermission(activity,
+        if (isFromCamera != null && isFromCamera && ContextCompat.checkSelfPermission(activity,
                 Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(activity,
                     Manifest.permission.CAMERA)) {
-                Toast.makeText(activity,"Please enable camera permissions",Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, "Please enable camera permissions", Toast.LENGTH_SHORT).show();
             }
             ActivityCompat.requestPermissions(activity,
                     new String[]{Manifest.permission.CAMERA},
                     REQUEST_CAMERA_PERMISSION);
             return false;
-        }
-        else if (isFromCamera!=null && ContextCompat.checkSelfPermission(activity,
+        } else if (isFromCamera != null && ContextCompat.checkSelfPermission(activity,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(activity,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                Toast.makeText(activity,"Please enable camera permissions",Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, "Please enable camera permissions", Toast.LENGTH_SHORT).show();
             }
             ActivityCompat.requestPermissions(activity,
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION);
             return false;
-        }
-        else if (ContextCompat.checkSelfPermission(activity,
+        } else if (ContextCompat.checkSelfPermission(activity,
                 Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(activity,
                     Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                Toast.makeText(activity,"Please enable camera permissions",Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, "Please enable camera permissions", Toast.LENGTH_SHORT).show();
             }
             ActivityCompat.requestPermissions(activity,
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
@@ -131,12 +124,11 @@ public class AddImageUtil {
     }
 
     public static void onRequestPermissionsResult(Activity activity, int requestCode,
-                                           String permissions[], int[] grantResults) {
-        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && isFromCamera!=null){
+                                                  String permissions[], int[] grantResults) {
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && isFromCamera != null) {
             if (isFromCamera) {
                 dispatchTakePictureIntent(activity);
-            }
-            else {
+            } else {
                 dispatchShowGalleryIntent(activity);
             }
         }
@@ -146,8 +138,7 @@ public class AddImageUtil {
     public static String onActivityResult(Context context, int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
             return currentImageFile.getAbsolutePath();
-        }
-        else if (requestCode == REQUEST_SELECT_PHOTO && resultCode == RESULT_OK) {
+        } else if (requestCode == REQUEST_SELECT_PHOTO && resultCode == RESULT_OK) {
             Uri selectedimg = data.getData();
             try {
                 return PathUtil.getPath(context, selectedimg);

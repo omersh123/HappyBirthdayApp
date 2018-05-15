@@ -3,4 +3,9 @@
     <string name="name_with_hint">name: %s</string>
     <string name="birthday_with_hint">birthday: %s</string>
     <string name="image_with_hint">image: %s</string>
+    <string name="activity_birthday_title">Toady %s is</string>
+    <string name="activity_birthday_month">Month old!</string>
+    <string name="activity_birthday_months">Months old!</string>
+    <string name="activity_birthday_year">year old!</string>
+    <string name="activity_birthday_years">years old!</string>
 </resources>

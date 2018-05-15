@@ -14,16 +14,16 @@
         android:id="@+id/camera_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@null"
         android:gravity="center"
-        android:text="CAMERA"
-        android:background="@null"/>
+        android:text="CAMERA" />
 
     <android.support.v7.widget.AppCompatButton
         android:id="@+id/gallery_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@null"
         android:gravity="center"
-        android:text="GALLERY"
-        android:background="@null"/>
+        android:text="GALLERY" />
 
 </LinearLayout>

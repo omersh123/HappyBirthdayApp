@@ -1,12 +1,12 @@
 package com.omer.happybirthdayapp.utils;
 
 import android.annotation.SuppressLint;
-import android.content.ContentUris; 
-import android.content.Context; 
-import android.database.Cursor; 
-import android.net.Uri; 
-import android.os.Build; 
-import android.os.Environment; 
+import android.content.ContentUris;
+import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 
@@ -43,11 +43,11 @@ public class PathUtil {
                     uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
                 }
                 selection = "_id=?";
-                selectionArgs = new String[]{ split[1] };
+                selectionArgs = new String[]{split[1]};
             }
         }
         if ("content".equalsIgnoreCase(uri.getScheme())) {
-            String[] projection = { MediaStore.Images.Media.DATA };
+            String[] projection = {MediaStore.Images.Media.DATA};
             Cursor cursor = null;
             try {
                 cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs, null);
