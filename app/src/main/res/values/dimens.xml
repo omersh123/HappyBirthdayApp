@@ -3,4 +3,5 @@
     <dimen name="activity_padding">10dp</dimen>
     <dimen name="share_button_padding">12dp</dimen>
     <dimen name="baby_image_padding">76dp</dimen>
+    <dimen name="activity_birthday_text_side_padding">40dp</dimen>
 </resources>

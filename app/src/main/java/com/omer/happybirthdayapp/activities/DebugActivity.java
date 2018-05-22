@@ -5,7 +5,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v7.app.AppCompatActivity;
@@ -21,9 +21,11 @@ import android.widget.Toast;
 import com.omer.happybirthdayapp.R;
 import com.omer.happybirthdayapp.models.Baby;
 import com.omer.happybirthdayapp.utils.AddImageUtil;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -47,7 +49,6 @@ public class DebugActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_debug);
         sdf = new SimpleDateFormat("MM/dd/yyyy");
-        reloadData();
         initUI();
         loadButtons();
     }
@@ -63,8 +64,6 @@ public class DebugActivity extends AppCompatActivity {
         startBirthdayActivityBtn = (AppCompatButton) findViewById(R.id.start_birthday_activity_btn);
 
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
-
-        reloadUI();
     }
 
     private void loadButtons() {
@@ -133,9 +132,17 @@ public class DebugActivity extends AppCompatActivity {
         debugActivityBirthdayTextView.setText(getString(R.string.birthday_with_hint, baby.isBirthdayEmpty() ? "" : sdf.format(baby.getBirthday())));
         debugActivityImageTextView.setText(getString(R.string.image_with_hint, baby.getImageUrl()));
 
-        if (AddImageUtil.checkGeneralPermissions(this)) {
-            babyBitmap = BitmapFactory.decodeFile(baby.getImageUrl());
-            debugActivityImageView.setImageBitmap(babyBitmap);
+        if (AddImageUtil.checkGeneralPermissions(this) && !baby.getImageUrl().isEmpty()) {
+            final Uri uri = Uri.fromFile(new File(baby.getImageUrl()));
+            debugActivityImageView.post(new Runnable() {
+                @Override
+                public void run() {
+                    Picasso.get().load(uri)
+                            .resize(debugActivityImageView.getHeight(), debugActivityImageView.getHeight()).centerCrop().into(debugActivityImageView);
+                }
+            });        }
+        else{
+            debugActivityImageView.setImageResource(0);
         }
         startBirthdayActivityBtn.setEnabled(baby.isValid());
     }
@@ -206,5 +213,12 @@ public class DebugActivity extends AppCompatActivity {
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && AddImageUtil.isFromCamera == null) {
             reloadUI();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        reloadData();
+        reloadUI();
     }
 }

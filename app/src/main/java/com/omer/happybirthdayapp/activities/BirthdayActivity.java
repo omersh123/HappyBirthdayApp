@@ -3,9 +3,9 @@ package com.omer.happybirthdayapp.activities;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
@@ -13,12 +13,15 @@ import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.AppCompatTextView;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.omer.happybirthdayapp.R;
 import com.omer.happybirthdayapp.models.Baby;
 import com.omer.happybirthdayapp.utils.AddImageUtil;
+import com.squareup.picasso.Picasso;
 
+import org.joda.time.Interval;
 import org.json.JSONException;
 
 import java.io.File;
@@ -44,6 +47,13 @@ public class BirthdayActivity extends AppCompatActivity {
     private AppCompatImageView ageImageView;
     private AppCompatTextView subtitleTextView;
     private AppCompatButton shareBtn;
+    private LinearLayout bottomSheet;
+    private BottomSheetBehavior<LinearLayout> bottomSheetBehavior;
+    private AppCompatImageButton editImageButton;
+    private AppCompatButton cameraBtn;
+    private AppCompatButton galleryBtn;
+    private int currentTheme = 0;
+
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,34 +70,36 @@ public class BirthdayActivity extends AppCompatActivity {
         titleTextView = (AppCompatTextView) findViewById(R.id.title_text_view);
         ageImageView = (AppCompatImageView) findViewById(R.id.age_image_view);
         subtitleTextView = (AppCompatTextView) findViewById(R.id.subtitle_text_view);
+        editImageButton = (AppCompatImageButton) findViewById(R.id.edit_image_button);
         shareBtn = (AppCompatButton) findViewById(R.id.share_btn);
-
+        bottomSheet = (LinearLayout) findViewById(R.id.bottom_sheet);
+        cameraBtn = (AppCompatButton) findViewById(R.id.camera_btn);
+        galleryBtn = (AppCompatButton) findViewById(R.id.gallery_btn);
         babyImageView.post(new Runnable() {
             @Override
             public void run() {
-                babyImageView.getLayoutParams().height = babyImageView.getWidth();
+                babyImageView.getLayoutParams().width = babyImageView.getHeight();
                 babyImageView.requestLayout();
             }
         });
-
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         randomBackgroundUI();
-        reloadUI();
     }
 
     private void randomBackgroundUI() {
-        int random = new Random().nextInt(3);
-        switch (random) {
+        currentTheme = new Random().nextInt(3);
+        switch (currentTheme) {
             case THEME_YELLOW:
                 backgroundImageView.setImageResource(R.drawable.android_elephant_popup);
-                babyImageView.setImageResource(R.drawable.default_place_holder_yellow);
+                editImageButton.setImageResource(R.drawable.camera_icon_yellow);
                 break;
             case THEME_GREEN:
                 backgroundImageView.setImageResource(R.drawable.android_fox_popup);
-                babyImageView.setImageResource(R.drawable.default_place_holder_green);
+                editImageButton.setImageResource(R.drawable.camera_icon_green);
                 break;
             case THEME_BLUE:
                 backgroundImageView.setImageResource(R.drawable.android_pelican_popup);
-                babyImageView.setImageResource(R.drawable.default_place_holder_blue);
+                editImageButton.setImageResource(R.drawable.camera_icon_blue);
                 break;
         }
     }
@@ -104,10 +116,33 @@ public class BirthdayActivity extends AppCompatActivity {
             public void onClick(View v) {
                 closeBtn.setVisibility(View.INVISIBLE);
                 shareBtn.setVisibility(View.INVISIBLE);
+                editImageButton.setVisibility(View.INVISIBLE);
                 Bitmap bitmap = getScreenShot(getWindow().getDecorView().findViewById(android.R.id.content));
                 shareImage(bitmap);
                 closeBtn.setVisibility(View.VISIBLE);
                 shareBtn.setVisibility(View.VISIBLE);
+                editImageButton.setVisibility(View.VISIBLE);
+
+            }
+        });
+        editImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showBottomSheet(true);
+            }
+        });
+        galleryBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showBottomSheet(false);
+                AddImageUtil.dispatchShowGalleryIntent(BirthdayActivity.this);
+            }
+        });
+        cameraBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showBottomSheet(false);
+                AddImageUtil.dispatchTakePictureIntent(BirthdayActivity.this);
             }
         });
     }
@@ -116,26 +151,57 @@ public class BirthdayActivity extends AppCompatActivity {
         titleTextView.setText(getString(R.string.activity_birthday_title, baby.getName()));
         reloadBirthdayToUI();
         if (AddImageUtil.checkGeneralPermissions(this) && !baby.getImageUrl().isEmpty()) {
-            babyBitmap = BitmapFactory.decodeFile(baby.getImageUrl());
-            babyImageView.setImageBitmap(babyBitmap);
+            final Uri uri = Uri.fromFile(new File(baby.getImageUrl()));
+            babyImageView.post(new Runnable() {
+                @Override
+                public void run() {
+                    Picasso.get().load(uri).placeholder(getCurrentPlaceHolder())
+                            .resize(babyImageView.getHeight(), babyImageView.getHeight()).centerCrop().into(babyImageView);
+                }
+            });
+        } else {
+            switch (currentTheme) {
+                case THEME_YELLOW:
+                    babyImageView.setImageResource(R.drawable.default_place_holder_yellow);
+                    break;
+                case THEME_GREEN:
+                    babyImageView.setImageResource(R.drawable.default_place_holder_green);
+                    break;
+                case THEME_BLUE:
+                    babyImageView.setImageResource(R.drawable.default_place_holder_blue);
+                    break;
+            }
+        }
+    }
+
+    private int getCurrentPlaceHolder() {
+        switch (currentTheme) {
+            case THEME_YELLOW:
+                return R.drawable.default_place_holder_yellow;
+            case THEME_GREEN:
+                return R.drawable.default_place_holder_green;
+            case THEME_BLUE:
+                return R.drawable.default_place_holder_blue;
+            default:
+                return 0;
         }
     }
 
     private void reloadBirthdayToUI() {
-        long ageInMillis = new Date().getTime() - baby.getBirthday().getTime();
-        long ageInYears = ageInMillis / YEAR_IN_MILLIS;
-        double ageInMonths = (double) (ageInMillis) / MONTH_IN_MILLIS;
-        if (ageInYears > 0) {
-            loadNumber(ageInYears);
-            if (ageInYears == 1) {
+        //Because we are using API19 as min version - we can't use the new JodaTime system (Java 8 only) - so we will use it from gradle.
+        Interval interval = new Interval(baby.getBirthday().getTime(), new Date().getTime());
+        org.joda.time.Period period = interval.toPeriod();
+        if (period.getYears() > 0) {
+            loadNumber(period.getYears(), period.getMonths() >= 6);
+            if (period.getYears() == 1 && period.getMonths() < 6) {
                 subtitleTextView.setText(getString(R.string.activity_birthday_year));
             } else {
                 subtitleTextView.setText(getString(R.string.activity_birthday_years));
             }
 
         } else {
-            loadNumber(ageInMonths);
-            if (ageInMonths >= 1 && ageInMonths < 1.5f) {
+            loadNumber(period.getMonths(), period.getDays() + period.getWeeks()*7 >= 15);
+            if (period.getMonths() == 1 && (period.getDays() + period.getWeeks()*7 < 15 )) {
                 subtitleTextView.setText(getString(R.string.activity_birthday_month));
             } else {
                 subtitleTextView.setText(getString(R.string.activity_birthday_months));
@@ -143,62 +209,48 @@ public class BirthdayActivity extends AppCompatActivity {
         }
     }
 
-    private void loadNumber(double ageAsFloat) {
-        if (ageAsFloat > 1 && ageAsFloat < 2) {
-            if (ageAsFloat < 1.5) {
-                ageImageView.setImageResource(R.drawable.n1);
-            } else {
-                ageImageView.setImageResource(R.drawable.n1_half);
-            }
-        } else {
-            int ageAsInt = (int) ageAsFloat;
-            switch (ageAsInt) {
-                case 0:
-                    ageImageView.setImageResource(R.drawable.n0);
-                    break;
-                case 1:
-                    ageImageView.setImageResource(R.drawable.n1);
-                    break;
-                case 2:
-                    ageImageView.setImageResource(R.drawable.n2);
-                    break;
-                case 3:
-                    ageImageView.setImageResource(R.drawable.n3);
-                    break;
-                case 4:
-                    ageImageView.setImageResource(R.drawable.n4);
-                    break;
-                case 5:
-                    ageImageView.setImageResource(R.drawable.n5);
-                    break;
-                case 6:
-                    ageImageView.setImageResource(R.drawable.n6);
-                    break;
-                case 7:
-                    ageImageView.setImageResource(R.drawable.n7);
-                    break;
-                case 8:
-                    ageImageView.setImageResource(R.drawable.n8);
-                    break;
-                case 9:
-                    ageImageView.setImageResource(R.drawable.n9);
-                    break;
-                case 10:
-                    ageImageView.setImageResource(R.drawable.n10);
-                    break;
-                case 11:
-                    ageImageView.setImageResource(R.drawable.n11);
-                    break;
-                case 12:
-                    ageImageView.setImageResource(R.drawable.n12);
-                    break;
-            }
+    private void loadNumber(int age, boolean isMoreThenHalf) {
+        switch (age) {
+            case 0:
+                ageImageView.setImageResource(R.drawable.n0);
+                break;
+            case 1:
+                ageImageView.setImageResource(isMoreThenHalf ? R.drawable.n1_half : R.drawable.n1);
+                break;
+            case 2:
+                ageImageView.setImageResource(R.drawable.n2);
+                break;
+            case 3:
+                ageImageView.setImageResource(R.drawable.n3);
+                break;
+            case 4:
+                ageImageView.setImageResource(R.drawable.n4);
+                break;
+            case 5:
+                ageImageView.setImageResource(R.drawable.n5);
+                break;
+            case 6:
+                ageImageView.setImageResource(R.drawable.n6);
+                break;
+            case 7:
+                ageImageView.setImageResource(R.drawable.n7);
+                break;
+            case 8:
+                ageImageView.setImageResource(R.drawable.n8);
+                break;
+            case 9:
+                ageImageView.setImageResource(R.drawable.n9);
+                break;
+            case 10:
+                ageImageView.setImageResource(R.drawable.n10);
+                break;
+            case 11:
+                ageImageView.setImageResource(R.drawable.n11);
+                break;
+            case 12:
+                ageImageView.setImageResource(R.drawable.n12);
+                break;
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
     }
 
     public void reloadData() {
@@ -210,6 +262,15 @@ public class BirthdayActivity extends AppCompatActivity {
         }
     }
 
+    public void saveData() {
+        try {
+            baby.save();
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error while saving model to remote disk", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     public static Bitmap getScreenShot(View view) {
         View screenView = view.getRootView();
         screenView.setDrawingCacheEnabled(true);
@@ -218,7 +279,7 @@ public class BirthdayActivity extends AppCompatActivity {
         return bitmap;
     }
 
-    private void shareImage(Bitmap bitmap){
+    private void shareImage(Bitmap bitmap) {
         //taken from http://androidtechpoint.blogspot.co.il/2017/09/android-sharing-image-using-share-intent-without-saving-to-external-memory.html
         try {
             File cachePath = new File(this.getCacheDir(), "images");
@@ -246,11 +307,6 @@ public class BirthdayActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -258,5 +314,32 @@ public class BirthdayActivity extends AppCompatActivity {
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && AddImageUtil.isFromCamera == null) {
             reloadUI();
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        baby.setImageUrl(AddImageUtil.onActivityResult(this, requestCode, resultCode, data));
+        saveData();
+        reloadUI();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (bottomSheetBehavior != null && bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED)
+            showBottomSheet(false);
+        else
+            super.onBackPressed();
+    }
+
+    private void showBottomSheet(boolean shouldShow) {
+        bottomSheetBehavior.setState(shouldShow ? BottomSheetBehavior.STATE_EXPANDED : BottomSheetBehavior.STATE_COLLAPSED);
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        reloadUI();
     }
 }

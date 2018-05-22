@@ -1,38 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <FrameLayout
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/frameLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="76dp"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:weightSum="90">
 
-            <android.support.v7.widget.AppCompatImageView
-                android:id="@+id/baby_image_view"
-                android:layout_width="0dp"
-                android:layout_height="400dp"
-                android:layout_gravity="bottom"
-                android:layout_weight="65"
-                android:scaleType="centerCrop"
-                tools:layout_height="236dp"
-                tools:src="@drawable/default_place_holder_green" />
-        </LinearLayout>
+
+        <android.support.constraint.Guideline
+            android:id="@+id/margin_bottom_guide_line"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="parent"
+            app:layout_constraintGuide_percent="0.87"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <android.support.constraint.Guideline
+            android:id="@+id/edit_image_button_top_guide_line"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="parent"
+            app:layout_constraintGuide_percent="0.45"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <android.support.constraint.Guideline
+            android:id="@+id/edit_image_button_end_guide_line"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="parent"
+            app:layout_constraintGuide_percent="0.77"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/baby_image_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:scaleType="centerCrop"
+            tools:src="@drawable/default_place_holder_green"
+            app:layout_constraintBottom_toTopOf="@+id/margin_bottom_guide_line"
+            app:layout_constraintTop_toBottomOf="@+id/edit_image_button_top_guide_line"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
 
         <android.support.v7.widget.AppCompatImageView
             android:id="@+id/background_image_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0"
             tools:src="@drawable/android_fox_popup" />
 
         <android.support.v7.widget.AppCompatImageButton
@@ -42,71 +77,104 @@
             android:background="@null"
             android:padding="10dp"
             android:src="@android:drawable/ic_menu_close_clear_cancel"
-            android:tint="@color/black" />
+            android:tint="@color/black"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <LinearLayout
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/title_text_view"
+            style="@style/BirthdayTextView"
+            android:layout_width="match_parent"
+            android:layout_height="37dp"
+            android:layout_marginEnd="@dimen/activity_birthday_text_side_padding"
+            android:layout_marginStart="@dimen/activity_birthday_text_side_padding"
+            android:ellipsize="end"
+            android:lines="2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/close_btn"
+            tools:text="Today lily is" />
+
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/age_image_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="15dp"
+            android:paddingEnd="20dp"
+            android:paddingStart="20dp"
+            android:paddingTop="15dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.501"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/title_text_view"
+            tools:src="@drawable/n8" />
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/appCompatImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/left_swirls"
+            app:layout_constraintBottom_toBottomOf="@+id/age_image_view"
+            app:layout_constraintEnd_toStartOf="@+id/age_image_view"
+            app:layout_constraintTop_toTopOf="@+id/age_image_view" />
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/appCompatImageView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/right_swirls"
+            app:layout_constraintBottom_toBottomOf="@+id/age_image_view"
+            app:layout_constraintStart_toEndOf="@+id/age_image_view"
+            app:layout_constraintTop_toTopOf="@+id/age_image_view" />
+
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/subtitle_text_view"
+            style="@style/BirthdayTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/activity_birthday_text_side_padding"
+            android:layout_marginStart="@dimen/activity_birthday_text_side_padding"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/age_image_view"
+            tools:text="Months old!" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/share_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/btn_share"
+            android:drawableEnd="@drawable/ic_share_pink"
+            android:paddingBottom="4dp"
+            android:drawablePadding="@dimen/share_button_padding"
             android:gravity="center"
-            android:orientation="vertical"
-            android:paddingTop="30dp">
+            android:paddingEnd="@dimen/share_button_padding"
+            android:paddingStart="@dimen/share_button_padding"
+            android:text="Share the news"
+            android:textAllCaps="false"
+            android:textColor="@color/pink_red"
+            android:textStyle="normal"
+            app:layout_constraintBottom_toTopOf="@+id/edit_image_button_top_guide_line"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/subtitle_text_view" />
 
-            <android.support.v7.widget.AppCompatTextView
-                android:id="@+id/title_text_view"
-                style="@style/BirthdayTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:lines="2"
-                tools:text="Today lily is" />
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal">
+        <android.support.v7.widget.AppCompatImageButton
+            android:id="@+id/edit_image_button"
+            android:layout_width="wrap_content"
+            android:layout_height="56dp"
+            android:background="@null"
+            android:padding="10dp"
+            android:src="@drawable/camera_icon_blue"
+            app:layout_constraintTop_toTopOf="@id/edit_image_button_top_guide_line"
+            app:layout_constraintEnd_toEndOf="@id/edit_image_button_end_guide_line"/>
 
-                <android.support.v7.widget.AppCompatImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/left_swirls" />
-
-                <android.support.v7.widget.AppCompatImageView
-                    android:id="@+id/age_image_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="15dp"
-                    tools:src="@drawable/n8" />
-
-                <android.support.v7.widget.AppCompatImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/right_swirls" />
-            </LinearLayout>
-
-            <android.support.v7.widget.AppCompatTextView
-                android:id="@+id/subtitle_text_view"
-                style="@style/BirthdayTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="Months old!" />
-
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/share_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_marginTop="18dp"
-                android:background="@drawable/btn_share"
-                android:drawableEnd="@drawable/ic_share_pink"
-                android:drawablePadding="@dimen/share_button_padding"
-                android:paddingBottom="2dp"
-                android:paddingEnd="@dimen/share_button_padding"
-                android:paddingStart="@dimen/share_button_padding"
-                android:text="Share the news"
-                android:textAllCaps="false"
-                android:textColor="@color/pink_red"
-                android:textStyle="normal" />
-
-        </LinearLayout>
-    </FrameLayout>
+    </android.support.constraint.ConstraintLayout>
+    <include layout="@layout/layout_add_image_bottom_sheet" />
 </android.support.design.widget.CoordinatorLayout>

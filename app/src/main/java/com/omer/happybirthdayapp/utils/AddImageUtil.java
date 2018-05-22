@@ -5,12 +5,16 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
@@ -149,5 +153,27 @@ public class AddImageUtil {
             }
         }
         return "";
+    }
+
+    public static void handleImageRotation(Context context, Bitmap bitmap, String bitmapPath) {
+        try {
+            ExifInterface exif = new ExifInterface(bitmapPath);
+            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
+            Log.d("EXIF", "Exif: " + orientation);
+            Matrix matrix = new Matrix();
+            if (orientation == 6) {
+                matrix.postRotate(90);
+            }
+            else if (orientation == 3) {
+                matrix.postRotate(180);
+            }
+            else if (orientation == 8) {
+                matrix.postRotate(270);
+            }
+            bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true); // rotating bitmap
+        }
+        catch (Exception e) {
+            Toast.makeText(context, "Error while loading image",Toast.LENGTH_SHORT).show();
+        }
     }
 }
